@@ -12,8 +12,11 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.iosharp.android.whereareyou.model.Point;
+import com.iosharp.android.whereareyou.sqlite.MySQLiteHelper;
 
 import java.util.ArrayList;
+import java.util.List;
 
 
 public class MainActivity extends ActionBarActivity {
@@ -28,8 +31,7 @@ public class MainActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mPoints = PointStore.get(getApplicationContext()).getPoints();
-        System.out.println(mPoints.size());
+        final MySQLiteHelper db = new MySQLiteHelper(this);
 
         initializeMap();
         mMap.setMyLocationEnabled(true);
@@ -41,7 +43,7 @@ public class MainActivity extends ActionBarActivity {
                     mLastLocation = location;
                 }
 
-                // If the device was just rotated, redraw polyline with previous points.
+//                If the device was just rotated, redraw polyline with previous points.
                 if (mAfterRotate) {
                     LatLng lastLocation = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
 
@@ -59,7 +61,9 @@ public class MainActivity extends ActionBarActivity {
 
                 PolylineOptions polylineOptions1 = new PolylineOptions().add(lastLatLng).add(thisLatLng).color(Color.RED);
                 mMap.addPolyline(polylineOptions1);
-                mPoints.add(lastLatLng);
+                Point lastPoint = new Point(lastLatLng.latitude, lastLatLng.longitude);
+                db.addPoint(lastPoint);
+//                db.getAllPoints().size();
 
                 mLastLocation = location;
             }
@@ -71,6 +75,10 @@ public class MainActivity extends ActionBarActivity {
         if (mMap == null) {
             mMap = ((MapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap();
         }
+    }
+
+    private LatLng toLatLng(Point point) {
+        return new LatLng(point.getLatitude(), point.getLongitude());
     }
 
     @Override

@@ -1,4 +1,4 @@
-package com.iosharp.android.whereareyou;
+package com.iosharp.android.whereareyou.model;
 
 import android.content.Context;
 
