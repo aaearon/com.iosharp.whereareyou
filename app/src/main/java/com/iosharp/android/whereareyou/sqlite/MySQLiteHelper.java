@@ -14,40 +14,43 @@ import java.util.List;
 
 public class MySQLiteHelper extends SQLiteOpenHelper {
 
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
     private static final String DATABASE_NAME = "PointDB";
-
-    // Points table name
-    private static final String TABLE_POINTS = "points";
-
-    // Points table column names
-    private static final String KEY_ID = "id";
-    private static final String KEY_LATITUDE = "latitude";
-    private static final String KEY_LONGITUDE = "longitude";
-
-    private static final String[] COLUMNS = {KEY_ID, KEY_LATITUDE, KEY_LONGITUDE};
 
     public MySQLiteHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
     @Override
-    public void onCreate(SQLiteDatabase sqLiteDatabase) {
+    public void onCreate(SQLiteDatabase db) {
+        Log.d("onCreate()", "onCreate() invoked");
+
         String CREATE_POINT_TABLE = "CREATE TABLE points ( " +
                 "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                "date INTEGER, " +
                 "latitude REAL, " +
                 "longitude REAL )";
 
-        sqLiteDatabase.execSQL(CREATE_POINT_TABLE);
+
+        db.execSQL(CREATE_POINT_TABLE);
     }
 
     @Override
-    public void onUpgrade(SQLiteDatabase sqLiteDatabase, int oldVersion, int newVersion) {
-        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS points");
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        // drop older points table if exists
+        db.execSQL("DROP TABLE IF EXISTS points");
 
-        this.onCreate(sqLiteDatabase);
+        // create fresh points table
+        this.onCreate(db);
     }
+
+    // CRUD
+    private static final String TABLE_POINTS = "points";
+
+    private static final String KEY_ID = "id";
+    private static final String KEY_LATITUDE = "latitude";
+    private static final String KEY_LONGITUDE = "longitude";
+
+    private static final String[] COLUMNS = {KEY_ID, KEY_LATITUDE, KEY_LONGITUDE};
 
     public void addPoint(Point point) {
         Log.d("addPoint", point.toString());
@@ -58,7 +61,9 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         values.put(KEY_LATITUDE, point.getLatitude());
         values.put(KEY_LONGITUDE, point.getLongitude());
 
-        db.insert(TABLE_POINTS, null, values);
+        db.insert(TABLE_POINTS, //table
+                null,   // null column hack
+                values); // key/value -> keys = column names/ values = column values
 
         db.close();
     }

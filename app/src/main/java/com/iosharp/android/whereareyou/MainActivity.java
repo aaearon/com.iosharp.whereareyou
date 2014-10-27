@@ -1,5 +1,6 @@
 package com.iosharp.android.whereareyou;
 
+import android.content.Context;
 import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
@@ -16,8 +17,6 @@ import com.iosharp.android.whereareyou.model.Point;
 import com.iosharp.android.whereareyou.sqlite.MySQLiteHelper;
 
 import java.util.ArrayList;
-import java.util.List;
-
 
 public class MainActivity extends ActionBarActivity {
 
@@ -32,7 +31,6 @@ public class MainActivity extends ActionBarActivity {
         setContentView(R.layout.activity_main);
 
         final MySQLiteHelper db = new MySQLiteHelper(this);
-
         initializeMap();
         mMap.setMyLocationEnabled(true);
 
@@ -44,14 +42,14 @@ public class MainActivity extends ActionBarActivity {
                 }
 
 //                If the device was just rotated, redraw polyline with previous points.
-                if (mAfterRotate) {
-                    LatLng lastLocation = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
-
-                    PolylineOptions polylineOptions = new PolylineOptions().add(lastLocation).addAll(mPoints).color(Color.BLUE);
-                    mMap.addPolyline(polylineOptions);
-
-                    mAfterRotate = false;
-                }
+//                if (mAfterRotate) {
+//                    LatLng lastLocation = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
+//
+//                    PolylineOptions polylineOptions = new PolylineOptions().add(lastLocation).addAll(mPoints).color(Color.BLUE);
+//                    mMap.addPolyline(polylineOptions);
+//
+//                    mAfterRotate = false;
+//                }
 
                 LatLng lastLatLng = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
                 LatLng thisLatLng = new LatLng(location.getLatitude(), location.getLongitude());
@@ -63,7 +61,6 @@ public class MainActivity extends ActionBarActivity {
                 mMap.addPolyline(polylineOptions1);
                 Point lastPoint = new Point(lastLatLng.latitude, lastLatLng.longitude);
                 db.addPoint(lastPoint);
-//                db.getAllPoints().size();
 
                 mLastLocation = location;
             }
