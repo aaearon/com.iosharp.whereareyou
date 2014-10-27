@@ -7,6 +7,8 @@ import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -17,6 +19,8 @@ import com.iosharp.android.whereareyou.model.Point;
 import com.iosharp.android.whereareyou.sqlite.MySQLiteHelper;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
 public class MainActivity extends ActionBarActivity {
 
@@ -28,9 +32,18 @@ public class MainActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-
+        setContentView(R.layout.fragment_map);
         final MySQLiteHelper db = new MySQLiteHelper(this);
+
+        Button button = (Button) findViewById(R.id.clear_points_button);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                db.deleteAll();
+
+            }
+        });
+
         initializeMap();
         mMap.setMyLocationEnabled(true);
 
@@ -42,14 +55,22 @@ public class MainActivity extends ActionBarActivity {
                 }
 
 //                If the device was just rotated, redraw polyline with previous points.
-//                if (mAfterRotate) {
-//                    LatLng lastLocation = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
-//
-//                    PolylineOptions polylineOptions = new PolylineOptions().add(lastLocation).addAll(mPoints).color(Color.BLUE);
-//                    mMap.addPolyline(polylineOptions);
-//
-//                    mAfterRotate = false;
-//                }
+                if (mAfterRotate) {
+
+                    List<LatLng> latLngs = new LinkedList<LatLng>();
+
+                    for (Point p: db.getAllPoints()) {
+                        LatLng latLng = new LatLng(p.getLatitude(), p.getLongitude());
+                        latLngs.add(latLng);
+                    }
+
+                    LatLng lastLocation = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
+
+                    PolylineOptions polylineOptions = new PolylineOptions().add(lastLocation).addAll(latLngs).color(Color.BLUE);
+                    mMap.addPolyline(polylineOptions);
+
+                    mAfterRotate = false;
+                }
 
                 LatLng lastLatLng = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
                 LatLng thisLatLng = new LatLng(location.getLatitude(), location.getLongitude());
@@ -72,31 +93,5 @@ public class MainActivity extends ActionBarActivity {
         if (mMap == null) {
             mMap = ((MapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap();
         }
-    }
-
-    private LatLng toLatLng(Point point) {
-        return new LatLng(point.getLatitude(), point.getLongitude());
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
     }
 }

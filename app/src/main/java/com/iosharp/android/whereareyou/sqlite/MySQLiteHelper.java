@@ -149,4 +149,10 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
 
         Log.d("deletePoint", point.toString());
     }
+
+    public void deleteAll() {
+        Log.d("deleteAll()", "deleteAll() invoked");
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete(TABLE_POINTS, null, null);
+    }
 }
