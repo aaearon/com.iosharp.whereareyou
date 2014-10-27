@@ -26,7 +26,6 @@ public class MainActivity extends ActionBarActivity {
 
     GoogleMap mMap;
     Location mLastLocation;
-    ArrayList<LatLng> mPoints;
     boolean mAfterRotate = true;
 
     @Override
@@ -57,17 +56,18 @@ public class MainActivity extends ActionBarActivity {
 //                If the device was just rotated, redraw polyline with previous points.
                 if (mAfterRotate) {
 
-                    List<LatLng> latLngs = new LinkedList<LatLng>();
+                    List<LatLng> oldPoints = new LinkedList<LatLng>();
 
+                    // Take existing points and convert to LatLngs so they can be added
                     for (Point p: db.getAllPoints()) {
                         LatLng latLng = new LatLng(p.getLatitude(), p.getLongitude());
-                        latLngs.add(latLng);
+                        oldPoints.add(latLng);
                     }
 
                     LatLng lastLocation = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
 
-                    PolylineOptions polylineOptions = new PolylineOptions().add(lastLocation).addAll(latLngs).color(Color.BLUE);
-                    mMap.addPolyline(polylineOptions);
+                    PolylineOptions oldPolylineOptions = new PolylineOptions().add(lastLocation).addAll(oldPoints).color(Color.BLUE);
+                    mMap.addPolyline(oldPolylineOptions);
 
                     mAfterRotate = false;
                 }
@@ -78,8 +78,8 @@ public class MainActivity extends ActionBarActivity {
                 // Follow the person
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(thisLatLng, 20));
 
-                PolylineOptions polylineOptions1 = new PolylineOptions().add(lastLatLng).add(thisLatLng).color(Color.RED);
-                mMap.addPolyline(polylineOptions1);
+                PolylineOptions polylineOptions = new PolylineOptions().add(lastLatLng).add(thisLatLng).color(Color.RED);
+                mMap.addPolyline(polylineOptions);
                 Point lastPoint = new Point(lastLatLng.latitude, lastLatLng.longitude);
                 db.addPoint(lastPoint);
 

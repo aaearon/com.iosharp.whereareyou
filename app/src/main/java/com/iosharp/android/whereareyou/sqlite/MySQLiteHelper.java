@@ -14,6 +14,7 @@ import java.util.List;
 
 public class MySQLiteHelper extends SQLiteOpenHelper {
 
+    private static final String TAG = MySQLiteHelper.class.getSimpleName();
     private static final int DATABASE_VERSION = 2;
     private static final String DATABASE_NAME = "PointDB";
 
@@ -23,7 +24,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        Log.d("onCreate()", "onCreate() invoked");
+        Log.d(TAG, "onCreate() invoked");
 
         String CREATE_POINT_TABLE = "CREATE TABLE points ( " +
                 "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
@@ -53,7 +54,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
     private static final String[] COLUMNS = {KEY_ID, KEY_LATITUDE, KEY_LONGITUDE};
 
     public void addPoint(Point point) {
-        Log.d("addPoint", point.toString());
+        Log.d(TAG, "addPoint: " + point.toString());
 
         SQLiteDatabase db = this.getWritableDatabase();
 
@@ -91,7 +92,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         point.setLatitude(Double.parseDouble(cursor.getString(1)));
         point.setLongitude(Double.parseDouble(cursor.getString(2)));
 
-        Log.d("getPoint("+ id + ")", point.toString());
+        Log.d(TAG, "getPoint("+ id + "): " + point.toString());
 
         return point;
     }
@@ -116,7 +117,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
             } while (cursor.moveToNext());
         }
 
-        Log.d("getAllPoints()", points.toString());
+        Log.d(TAG, "getAllPoints(): " + points.toString());
 
         return points;
     }
@@ -147,7 +148,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
 
         db.close();
 
-        Log.d("deletePoint", point.toString());
+        Log.d(TAG, "deletePoint(): " + point.toString());
     }
 
     public void deleteAll() {
